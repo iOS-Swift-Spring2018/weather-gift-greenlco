@@ -8,6 +8,7 @@
 
 import UIKit
 import GooglePlaces
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -15,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        GMSPlacesClient.provideAPIKey("AIzaSyDDurZzKeC2GYeAQ4hM53Zyu4EaD8eLYy8")
+        GMSPlacesClient.provideAPIKey("AIzaSyA5oc18TM3wTd2USSqJQdDy5YWa1PmiQa8")
         return true
     }
 

@@ -25,7 +25,7 @@ class PageVC: UIPageViewController {
         delegate = self
         dataSource = self
         
-        var newLocation = WeatherLocation()
+        let newLocation = WeatherLocation()
         newLocation.name = ""
         locationsArray.append(newLocation)
         
@@ -42,7 +42,7 @@ class PageVC: UIPageViewController {
         let pageControlHeight: CGFloat = barButtonWidth
         let pageControlWidth: CGFloat = view.frame.width - (barButtonWidth * 2)
         let safeHeight = view.frame.height - view.safeAreaInsets.bottom
-        pageControl = UIPageControl(frame: CGRect(x: (view.frame.width - pageControlWidth) / 2, y: safeHeight - pageControlHeight, width: pageControlWidth, height: pageControlHeight))
+        pageControl = UIPageControl(frame: CGRect(x: (view.frame.width - pageControlWidth)/2, y: safeHeight - pageControlHeight, width: pageControlWidth, height: pageControlHeight))
         pageControl.pageIndicatorTintColor = UIColor.lightGray
         pageControl.currentPageIndicatorTintColor = UIColor.black
         pageControl.backgroundColor = UIColor.white
@@ -50,17 +50,15 @@ class PageVC: UIPageViewController {
         pageControl.currentPage = currentPage
         pageControl.addTarget(self, action: #selector(pageControlPressed), for: .touchUpInside)
         view.addSubview(pageControl)
-        
-
     }
     //MARK:- UI-Configuration Methods
     func configureListButton() {
         let barButtonHeight = barButtonWidth
         let safeHeight = view.frame.height - view.safeAreaInsets.bottom
-        listButton = UIButton(frame: CGRect(x: view.frame.width - barButtonWidth, y: safeHeight - barButtonHeight, width: barButtonWidth, height: barButtonHeight))
         
-        listButton.setImage(UIImage(named: "listbutton"), for: .normal)
-        listButton.setImage(UIImage(named: "listbutton-highlighted"), for: .highlighted)
+        listButton = UIButton(frame: CGRect(x: view.frame.width - barButtonWidth, y: safeHeight - barButtonHeight, width: barButtonWidth, height: barButtonHeight))
+        listButton.setBackgroundImage(UIImage(named: "listbutton"), for: .normal)
+        listButton.setBackgroundImage(UIImage(named: "listbutton-highlighted"), for: .highlighted)
         listButton.addTarget(self, action: #selector(segueToListVC), for: .touchUpInside)
         view.addSubview(listButton)
         
@@ -125,8 +123,7 @@ extension PageVC: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
         return nil
     }
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        if let currentViewController = pageViewController.viewControllers?[0] as?
-            DetailVC {
+        if let currentViewController = pageViewController.viewControllers?[0] as? DetailVC {
             pageControl.currentPage = currentViewController.currentPage
         }
     }

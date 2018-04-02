@@ -8,10 +8,10 @@
 
 import UIKit
 import GooglePlaces
+
 class ListVC: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
-    
     @IBOutlet weak var addBarButton: UIBarButtonItem!
     @IBOutlet weak var editBarButton: UIBarButtonItem!
     
@@ -37,7 +37,7 @@ class ListVC: UIViewController {
         if tableView.isEditing == true {
             tableView.setEditing(false, animated: true)
             editBarButton.title = "Edit"
-            addBarButton.isEnabled = false
+            addBarButton.isEnabled = true
         } else {
             tableView.setEditing(true, animated: true)
             editBarButton.title = "Done"
@@ -46,10 +46,11 @@ class ListVC: UIViewController {
         }
     }
     
-    @IBAction func addBarButtonPressed(_ sender: UIBarButtonItem) {
-        
+    @IBAction func addBarButtonPressed(_ sender: UIBarButtonItem) {let autocompleteController = GMSAutocompleteViewController()
+        autocompleteController.delegate = self
+        present(autocompleteController, animated: true, completion: nil)
     }
-    
+
 }
 extension ListVC: UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -89,7 +90,7 @@ extension ListVC: UITableViewDelegate, UITableViewDataSource{
     
     func updateTable(place: GMSPlace){
         let newIndexPath = IndexPath(row: locationsArray.count, section: 0)
-        var newWeatherLocation = WeatherLocation()
+        let newWeatherLocation = WeatherLocation()
         newWeatherLocation.name = place.name
         let latitude = place.coordinate.latitude
         let longitude = place.coordinate.longitude
