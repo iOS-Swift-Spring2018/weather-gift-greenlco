@@ -24,6 +24,8 @@ class ListVC: UIViewController {
         tableView.dataSource = self
     }
 
+    // Prepares view controller for segue
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ToPageVC" {
             let destination = segue.destination as! PageVC
@@ -33,6 +35,17 @@ class ListVC: UIViewController {
         }
     }
     
+    func saveLocations () {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(locationsArray) {
+        UserDefaults.standard.set(encoded, forKey: "locationsArray")
+    } else {
+    print("ERROR: Saving encoded did not work")
+        }
+    }
+    
+    //Buttons
+    
     @IBAction func editBarButtonPressed(_ sender: UIBarButtonItem) {
         if tableView.isEditing == true {
             tableView.setEditing(false, animated: true)
@@ -41,18 +54,22 @@ class ListVC: UIViewController {
         } else {
             tableView.setEditing(true, animated: true)
             editBarButton.title = "Done"
-            editBarButton.isEnabled = false
+            addBarButton.isEnabled = false
             
         }
     }
     
-    @IBAction func addBarButtonPressed(_ sender: UIBarButtonItem) {let autocompleteController = GMSAutocompleteViewController()
+    @IBAction func addBarButtonPressed(_ sender: UIBarButtonItem) {
+        let autocompleteController = GMSAutocompleteViewController()
         autocompleteController.delegate = self
         present(autocompleteController, animated: true, completion: nil)
     }
 
 }
 extension ListVC: UITableViewDelegate, UITableViewDataSource{
+    
+    //Table properties
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return locationsArray.count
     }
@@ -64,10 +81,12 @@ extension ListVC: UITableViewDelegate, UITableViewDataSource{
     }
     
     //MARK:- tableView Editing Functions
+    
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             locationsArray.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
+            saveLocations()
         }
     }
     
@@ -75,11 +94,15 @@ extension ListVC: UITableViewDelegate, UITableViewDataSource{
         let itemToMove = locationsArray[sourceIndexPath.row]
         locationsArray.remove(at: sourceIndexPath.row)
         locationsArray.insert(itemToMove, at: destinationIndexPath.row)
+        saveLocations()
     }
+    
     //MARK:- tableView methods to freeze the first cell
+    
     func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         return (indexPath.row != 0 ? true : false)
     }
+    
     func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         return (indexPath.row != 0 ? true : false)
     }
@@ -90,20 +113,24 @@ extension ListVC: UITableViewDelegate, UITableViewDataSource{
     
     func updateTable(place: GMSPlace){
         let newIndexPath = IndexPath(row: locationsArray.count, section: 0)
-        let newWeatherLocation = WeatherLocation()
-        newWeatherLocation.name = place.name
         let latitude = place.coordinate.latitude
         let longitude = place.coordinate.longitude
-        newWeatherLocation.coordinates = "\(latitude),\(longitude)"
-        print(newWeatherLocation.coordinates)
+        let newCoordinates = "\(latitude),\(longitude)"
+        let newWeatherLocation = WeatherLocation(name: place.name, coordinates: newCoordinates)
         locationsArray.append(newWeatherLocation)
         tableView.insertRows(at: [newIndexPath], with: .automatic)
+        saveLocations()
     }
 }
+
+
+
+// Picking for locations from Googlemaps
 
 extension ListVC: GMSAutocompleteViewControllerDelegate {
     
     // Handle the user's selection.
+    
     func viewController(_ viewController: GMSAutocompleteViewController, didAutocompleteWith place: GMSPlace) {
         dismiss(animated: true, completion: nil)
         updateTable(place: place)

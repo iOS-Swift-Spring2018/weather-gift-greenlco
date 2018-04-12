@@ -10,6 +10,7 @@ import UIKit
 
 class PageVC: UIPageViewController {
     
+    // Variables
     
     var currentPage = 0
     var locationsArray = [WeatherLocation]()
@@ -17,20 +18,21 @@ class PageVC: UIPageViewController {
     var barButtonWidth: CGFloat = 44
     var listButton: UIButton!
     
-    
+    // viewDidLoad
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         delegate = self
         dataSource = self
         
-        let newLocation = WeatherLocation()
-        newLocation.name = ""
+        let newLocation = WeatherLocation(name: "", coordinates: "")
         locationsArray.append(newLocation)
+        loadLocations()
         
         setViewControllers([createDetailVC(forPage: 0)], direction: .forward, animated: false, completion: nil)
     }
+    
+    // Changing pages animation
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -38,6 +40,19 @@ class PageVC: UIPageViewController {
         configureListButton()
     }
 
+    func loadLocations() {
+        guard let locationsEncoded = UserDefaults.standard.value(forKey: "locationsArray") as? Data else{
+            print("Cound not load locationsArray data from UserDefaults.")
+            return
+        }
+        let decoder = JSONDecoder()
+        if let locationsArray = try? decoder.decode(Array.self, from: locationsEncoded) as [WeatherLocation] {
+            self.locationsArray = locationsArray
+        }
+    }
+    
+    // PAGE CONTROL
+    
     func configurePageControl() {
         let pageControlHeight: CGFloat = barButtonWidth
         let pageControlWidth: CGFloat = view.frame.width - (barButtonWidth * 2)
@@ -51,7 +66,10 @@ class PageVC: UIPageViewController {
         pageControl.addTarget(self, action: #selector(pageControlPressed), for: .touchUpInside)
         view.addSubview(pageControl)
     }
+    
+
     //MARK:- UI-Configuration Methods
+    
     func configureListButton() {
         let barButtonHeight = barButtonWidth
         let safeHeight = view.frame.height - view.safeAreaInsets.bottom
@@ -64,7 +82,9 @@ class PageVC: UIPageViewController {
         
         
     }
+    
     //MARK:- Segues
+    
     @objc func segueToListVC() {
         performSegue(withIdentifier: "ToListVC", sender: nil)
     }
@@ -81,6 +101,8 @@ class PageVC: UIPageViewController {
     
     // 96765653da1ad1527638a6947d63e980 dark sky api
     
+    //IBAction for listVC
+    
     @IBAction func unwindFromListVC(sender: UIStoryboardSegue){
         pageControl.numberOfPages = locationsArray.count
         pageControl.currentPage = currentPage
@@ -88,6 +110,7 @@ class PageVC: UIPageViewController {
     }
     
     //MARK:- Create View Controller for UIPageViewController
+    
     func createDetailVC(forPage page: Int) -> DetailVC {
         
         currentPage = min(max(0, page), locationsArray.count - 1)
@@ -101,6 +124,8 @@ class PageVC: UIPageViewController {
     }
     
 }
+
+    //Scrolling through different pages
 
 extension PageVC: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
@@ -122,11 +147,13 @@ extension PageVC: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
         }
         return nil
     }
+    
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         if let currentViewController = pageViewController.viewControllers?[0] as? DetailVC {
             pageControl.currentPage = currentViewController.currentPage
         }
     }
+    
    @objc func pageControlPressed() {
     guard let currentViewController = self.viewControllers?[0] as? DetailVC else {return}
             currentPage = currentViewController.currentPage

@@ -9,7 +9,8 @@
 import Foundation
 
 extension TimeInterval {
-    
+ 
+    // Date Format
     
     func format(timeZone: String, dateFormatter: DateFormatter) -> String {
         let usuableDate = Date(timeIntervalSince1970: self)
